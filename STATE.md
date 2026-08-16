@@ -46,6 +46,32 @@ routine 当前 prompt 的真实版本以 `RemoteTrigger action:get trigger_id:tr
 查到的为准，不要看 automation/routine-design.md 的旧草稿（那是排查前的设计，已过时，
 没有回头更新，下次有空再补一份准确版）。
 
+### 关于「为什么别的项目能发 Telegram」（2026-08-16 查证，别再重复排查）
+
+用户提到 Telegram 上收到 `zenithOpsBot` 的推送，怀疑云端也能发。查证结论：**能不能发 Telegram
+取决于「谁在发」，不取决于「发什么」。**
+
+`zenithOpsBot` 属于 **Zenith Ops**——用户健身器材公司（Zenith Muscle Fitness）那套运营自动化，
+跟 AuShow Radar / AUComplianceAI 都无关。核实过程：
+- 两个仓库的全部历史（aushow 61 commits、aucompliance 49 commits）全文搜 `telegram`/`zenith`
+  零匹配；michaelxu0814-ai 名下另外两个仓库（aus-ticketing 空仓、company-website）也没有。
+- Gmail 里有完整的 Zenith Ops 通知流：发件人 `support@zenithmusclefitness.com`，主题前缀
+  `[Zenith Ops]` / `[MC Monitor]` / `[Optimizer]`，固定节奏（每天 09:00 布里斯班、周日 18:00 周报）。
+  自有域名 + 自有 SMTP + 自有调度 = 跑在用户自己的基础设施上（Mac 本地，或 `UEXU` 那个 GitHub 账号下）。
+- 所以它出网不受限，直连 `api.telegram.org` 没问题；而 FDE 闪卡跑在 Claude 云端 routine 沙盒里，
+  代理层白名单不含 Telegram（本会话再次实测 curl 仍是 403），这个限制绕不过去。
+
+FDE 闪卡若要改用 Telegram，只能把「发送」这一步挪到有出网自由的地方，两条路：
+- **A. 挂进 Zenith Ops**：复用现成的 token/chat_id/定时器，加个读 flashcards.json 的小脚本即可，
+  最省事；但继承 Mac 的毛病——关机不跑、漏了不补（AuShow 也有这个问题）。闪卡漏一天无所谓。
+- **B. 部署到 Railway**：小服务 + cron 自己推。不依赖 Mac 开机，且 Railway 本就在课程固定技术栈里，
+  搭这个本身就能当练手项目（定时任务 / 外部 API / 部署 / 密钥管理，全是 FDE 要会的）。
+
+两条都需要用户提供 bot token + chat_id。**建议用 @BotFather 新建一个专用 bot**，别跟公司运营
+告警共用 zenithOpsBot，否则学习闪卡和生意告警混在一个会话里更乱。
+
+**决策未定，等用户拍板；在此之前邮件方案继续跑，不要擅自改 routine。**
+
 ## 仓库
 
 github.com/michaelxu0814-ai/FDE-Manual （**public**，已改公开以绕开云端写权限问题；
