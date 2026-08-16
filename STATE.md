@@ -104,8 +104,27 @@ Google Drive 上的 ZenithMuscle-Ops 备份里，`.env` 和 `.env.template` **�
 client secret / refresh token、Zoho 邮箱密码、Pinterest token。`.env.template` 本应是可分享的
 模板，却填着真实的 Anthropic key 和 Shopify token。
 
-已告知用户尽快轮换（优先 Anthropic key 和 Shopify token：一个能烧钱，一个能读写店铺订单和客户
-数据）。**本仓库未记录任何凭据值，也不要往这里抄。**
+**成因**：2026-05-03 的一次搬家式整目录上传（大概率 Windows → Mac 迁移）。My Drive 根目录下
+`.claude` / `.claude-mem` / `.config` / `ZenithMuscle-Ops` 四个文件夹创建时间都是那一天，是把
+`C:\Users\micha\` 下的目录整包传上去的（`.claude/projects/c--Users-micha-Documents-ZenithMuscle-Ops`
+这个命名格式可佐证）。一次性上传，非持续同步。根因是**防护只覆盖了 Git（.gitignore），没覆盖备份
+通路**——`.env` 对"选中文件夹→上传"毫无抵抗力。
+
+**暴露面（已核查权限）**：`ZenithMuscle-Ops` 文件夹和 `.env` 文件的权限均为
+**仅 michaelxu0814@gmail.com (owner)**，未共享、无公开链接。所以不是已发生的泄露，是风险敞口。
+但敞口真实：(1) Google 账号成了所有密钥的单点故障；(2) 任何拿到 Drive 授权的第三方应用都能读到
+——本次排查就是通过 Drive 连接器读出 `.env` 原文的；(3) 备份不会自己过期。
+
+已告知用户尽快轮换（优先级：Anthropic key → Shopify token/secret → Zoho 邮箱密码 →
+Google Ads refresh token/secret → Pinterest token），换完需在 Windows 上更新 `.env` 并
+`pm2 restart zenith-ops`，否则系统开始报 401。另建议删除 Drive 上的副本（用户未确认，
+**不要擅自删除**）、密钥改存密码管理器、`.env.template` 只留变量名、Google 账号开 2FA 并清理
+第三方 Drive 授权。
+
+**本仓库未记录任何凭据值，也不要往这里抄。**
+
+> 这个案例可以直接用作课程里「密钥管理」一节的教学素材——"防护只覆盖一条通路"是行业中最常见的
+> 密钥泄露成因之一，比教科书例子实在。
 
 ## 仓库
 
