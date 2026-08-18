@@ -1,12 +1,13 @@
 {
   "current_week": 1,
-  "last_sent_id": "w1-04",
-  "last_sent_at": "2026-08-18T00:03:02Z",
+  "last_sent_id": "w1-05",
+  "last_sent_at": "2026-08-18T03:03:04Z",
   "sent_ids": [
     "w1-01",
     "w1-02",
     "w1-03",
-    "w1-04"
+    "w1-04",
+    "w1-05"
   ],
   "week_complete_notified": false
 }
