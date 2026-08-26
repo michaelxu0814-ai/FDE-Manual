@@ -2,7 +2,7 @@
 
 > 每次会话开场先读本文件。完整纲要见 README.md，本周任务见 phase-01/week-01-tasks.md。
 
-最后更新：2026-08-18
+最后更新：2026-08-20
 
 ## 这是什么
 
@@ -22,7 +22,7 @@ https://claude.ai/code/artifact/bc6e384e-4c69-4b40-9043-1baa80085681
       自己讲了一遍"为什么要用虚拟环境"，讲得基本到位（隔离 + 干净），补充了"不同项目
       依赖版本冲突"这个具体场景。（闪卡进度 w1-01~w1-06 已经因为测试提前推送过，跟这里
       的实操进度是两条独立的线，不用对齐）
-- [~] 2026-08-18 Week 1 Day 2（第一次调用 Claude API）大部分完成，**最后一步待确认**：
+- [x] 2026-08-20 Week 1 Day 2（第一次调用 Claude API）**完成**：
       - [x] API key 已申请，存进 `fde-week1/.env`（单行 `ANTHROPIC_API_KEY=...`，1 行已核实）
       - [x] `.gitignore` 先建后写 key，顺序正确；已扩成 `.env*` 通配
       - [x] `python-dotenv` 走了 CONVENTIONS.md 卡点 1——**这次真的查了 pypi.org**
@@ -30,7 +30,19 @@ https://claude.ai/code/artifact/bc6e384e-4c69-4b40-9043-1baa80085681
             出卡等用户点头后才装。规矩第一次真正生效
       - [x] 写好 `hello_claude.py`（load_dotenv + `anthropic.Anthropic()` 空构造 + 
             `messages.create(model="claude-opus-5", max_tokens=1000)` + 遍历 content 打印 text）
-      - [ ] **脚本是否跑通未确认**——用户说"课程继续"但没贴输出。下次开场先问这个
+      - [x] **脚本跑通了**——`python3 hello_claude.py` 打印出模型回复（"我是 Claude，
+            由 Anthropic 开发的 AI 助手…"）。Day 2 核心目标达成
+      - [x] `.env.save` 已清除，`.gitignore` 已加 `.env*`（用户跑了两遍，所以文件里有两行
+            `.env*`，Git 不在乎重复，无需处理）
+- **Day 2 的第二个教训（比第一个更值钱）**：`.env*` 那条修复措施——发现了、讨论了、
+  给了命令、用户也认可了——**然后没被执行，流程继续往下走了**，直到看用户贴的终端截图
+  才发现 `.env.save` 还在。**"谁去扫一眼"的下一句是"扫完谁去确认真的改了"。交付里最
+  常见的事故不是没发现问题，是发现了、说好要改、然后没人回头确认改没改。** 这直接
+  催生了当天的执行清单设计（每条动作必须配「怎么证明做完了」一栏）。
+- **下次会话从 Day 3 开始**：不写新代码，逐行拆解 `hello_claude.py`，搞懂五个问题——
+  这本质上是不是一次 HTTP 请求 / `role` 的 user 与 assistant / `system` 参数与 user 消息
+  的区别 / `model` 与 `max_tokens` 各控制什么 / token 是什么、为什么按 token 计费。
+  产出不是代码，是用户能不看答案口头讲一遍。
 - **Day 2 中途抓到的真实安全问题（教学素材，值得记住）**：`ls -a` 发现 `.env.save`——
   nano 被中断时留下的应急备份，里面同样有 key，但当时 `.gitignore` 只写了 `.env`，
   覆盖不到它。当时还没 `git init` 所以没实际泄露。处理：`.gitignore` 改用 `.env*` 通配 +
