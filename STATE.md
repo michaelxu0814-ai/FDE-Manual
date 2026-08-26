@@ -22,9 +22,24 @@ https://claude.ai/code/artifact/bc6e384e-4c69-4b40-9043-1baa80085681
       自己讲了一遍"为什么要用虚拟环境"，讲得基本到位（隔离 + 干净），补充了"不同项目
       依赖版本冲突"这个具体场景。（闪卡进度 w1-01~w1-06 已经因为测试提前推送过，跟这里
       的实操进度是两条独立的线，不用对齐）
-- [ ] Week 1 Day 2（第一次调用 Claude API）尚未开始——下次会话从这里接着走：去
-      console.anthropic.com 申请 API key（用户自己做，Claude Code 代劳不了）、写最短脚本
-      发一句话给模型并打印回复、API key 存环境变量不要写死在代码里
+- [~] 2026-08-18 Week 1 Day 2（第一次调用 Claude API）大部分完成，**最后一步待确认**：
+      - [x] API key 已申请，存进 `fde-week1/.env`（单行 `ANTHROPIC_API_KEY=...`，1 行已核实）
+      - [x] `.gitignore` 先建后写 key，顺序正确；已扩成 `.env*` 通配
+      - [x] `python-dotenv` 走了 CONVENTIONS.md 卡点 1——**这次真的查了 pypi.org**
+            （1.2.3 / 2026-08-16 发布 / theskumar 维护 / BSD-3 / Trusted Publishing / 无依赖），
+            出卡等用户点头后才装。规矩第一次真正生效
+      - [x] 写好 `hello_claude.py`（load_dotenv + `anthropic.Anthropic()` 空构造 + 
+            `messages.create(model="claude-opus-5", max_tokens=1000)` + 遍历 content 打印 text）
+      - [ ] **脚本是否跑通未确认**——用户说"课程继续"但没贴输出。下次开场先问这个
+- **Day 2 中途抓到的真实安全问题（教学素材，值得记住）**：`ls -a` 发现 `.env.save`——
+  nano 被中断时留下的应急备份，里面同样有 key，但当时 `.gitignore` 只写了 `.env`，
+  覆盖不到它。当时还没 `git init` 所以没实际泄露。处理：`.gitignore` 改用 `.env*` 通配 +
+  `rm .env.save`。**给用户点明的道理：照着清单做完 ≠ 安全，清单是人写的、人想不到的
+  就不在清单上；这个洞是 `ls -a`「去看现场」抓出来的，不是任何一条纪律抓出来的——
+  这就是五步方法论里「验收 Harden」存在的理由。**
+- **Day 2 踩过的坑**：新开终端窗口没激活 venv → `pip: command not found`。借机给了
+  `command not found` 四步排错链（拼写→环境激活了吗→真装过吗→`which`）和开工三连
+  （`cd ~/fde-week1` / `source venv/bin/activate` / `pwd`）。
 
 ## 推送机制（最终方案，与最初设计不同，勿被 automation/routine-design.md 的旧草稿带偏）
 
