@@ -57,7 +57,8 @@ FDE-Manual/
   README.md             本文件（学什么）
   CONVENTIONS.md        工作规约（怎么做才算合规：装包前核查、密钥纪律、执行前解释）
   phase-01/
-    week-01-tasks.md    Week 1 每日任务（每天末尾带「延展 · 你没问但该知道的」）
+    week-01-tasks.md     Week 1 每日任务：为什么学、学什么（每天末尾带「延展」）
+    week-01-checklist.md Week 1 执行清单：照着敲什么、怎么证明做完了 ← 上课照这个走
     flashcards.json     闪卡题库（推送机制读这个）
     progress.json        推送进度（已废弃，推送机制现在不读写它，见 STATE.md）
   automation/
