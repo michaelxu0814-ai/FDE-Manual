@@ -1,8 +1,8 @@
 # STATE — 驻场手册 (FDE 三月纲要)
 
-> 每次会话开场先读本文件。完整纲要见 README.md，本周任务见 phase-01/week-01-tasks.md。
+> 每次会话开场先读本文件。完整纲要见 README.md，本周任务见 phase-01/week-0N-tasks.md。
 
-最后更新：2026-08-16
+最后更新：2026-08-28
 
 ## 这是什么
 
@@ -14,45 +14,55 @@ https://claude.ai/code/artifact/bc6e384e-4c69-4b40-9043-1baa80085681
 ## 进度
 
 - [x] 2026-08-16 纲要确认（五步方法论 + 固定技术骨架 Python/Claude API/SQLite+Pandas/Streamlit/Railway/Git + 三段模拟客户）
-- [x] 2026-08-16 Phase 01 Week 1 任务拆解 + 首批闪卡完成
-- [x] 2026-08-16 推送机制搭建完成并测试通过——**邮件闪卡**（不是 Telegram，见下方说明），
-      routine `trig_01WqFq2oP9jkSELV75hLiNpu`，工作日 10:03/13:03/16:03 布里斯班时间
-- [ ] Week 1 尚未正式开始执行（闪卡已经因为测试跑掉了 w1-01、w1-02，用户实际上周一开始前
-      已经"看到"这两张，可以酌情跳过或当复习）
+- [x] 2026-08-16 Phase 01 Week 1 任务 + 首批闪卡完成
+- [x] 2026-08-18 本地 launchd + Telegram 推送机制跑通（取代云端 Gmail 方案，见下）
+- [x] 2026-08-18~20 Week 1 的 10 张卡发完
+- [ ] 08-21~27 断推一周（见"故障复盘"）
+- [x] 2026-08-28 补充 Week 2-4 课程与题库，推送恢复（w1-10 解析 + w2-01 已补发）
+- [ ] Week 2 进行中：phase-01/week-02-tasks.md（RAG 搭建）
 
-## 推送机制（最终方案，与最初设计不同，勿被 automation/routine-design.md 的旧草稿带偏）
+## 推送机制（最终方案）
 
-**渠道是邮件，不是 Telegram。** 排查过程：
-1. Telegram：云端 routine 沙盒的出网白名单不含 api.telegram.org，curl 直接 403，排除。
-2. `PushNotification` / Remote Control：查证后确认 Remote Control 推送要求本地 Mac 开着
-   活跃会话，云端 routine 独立触发时永远推不到手机，排除。
-3. 最终用 **Gmail**（MCP 连接器，云端环境默认自动带上，不受出网白名单限制）发邮件到
-   michaelxu0814@gmail.com。
+**本地 launchd + Telegram bot（t.me/FDE2026_BOT）。** 不是云端 routine，不是邮件。
 
-**进度不写回仓库。** 一开始设计是 routine 读写 `phase-01/progress.json` 并 git commit/push，
-但云端环境对 `michaelxu0814-ai/FDE-Manual` 只有读权限、没有写权限（git push 和 GitHub API
-写入 `create_or_update_file`/`push_files` 全部 403 "Resource not accessible by integration"）。
-把仓库改成 public 只解决了读（clone 不需要认证），写权限这条路排查后确认走不通——大概率是
-Claude 的 GitHub App 装在这台机器本地 `gh` 用的账号（UEXU 或另一个）上，没授权到
-michaelxu0814-ai 这个账号 / 这个仓库，且这个授权环节需要账号本人在网页里操作，本 session
-无法代劳，也没找到具体入口（尝试过 github.com/settings/installations 未果）。
+- 任务：`~/Library/LaunchAgents/com.fdemanual.flashcard.plist` → `automation/send_flashcard.sh`
+- 时间：工作日 10:03 / 13:03 / 16:03（脚本内判断周末跳过）
+- 逻辑：读 `phase-01/flashcards.json` + `progress.json`；每次触发先发上一张卡的"解析"，
+  再发下一张未发的新题；`send_msg` 用 Telegram API 返回 HTTP 码，**两条都 200 才推进进度**
+  （发送失败不推进，下次自动重试，不会静默丢卡）；随后 git add/commit/push `progress.json`。
+- 密钥：`automation/telegram.env`（gitignore），token/chat_id 见该文件。
+- 周次标签：从卡片 id（`w2-01`）自动推导，跨周无需手动改。
+- **依赖本地 Mac 开机**。用户已确认通常开着；若某次关机错过推送，开机后下一次触发会继续
+  （脚本无状态补偿，补发上一张解析）。
 
-改成**无状态设计**：routine 每次触发都用 Gmail 搜索工具查"FDE闪卡 · Week N"开头的已发邮件，
-从邮件主题反推哪些卡片 id 已经发过，不依赖仓库里任何可写状态。`phase-01/progress.json` 和
-`phase-01/flashcards.json` 里 `week_complete_notified` 字段等设计已经作废，仓库现在纯只读，
-`progress.json` 文件留着但 routine 不会碰它，不用管它是否准确。
+### 为什么不用云端 routine（历史）
 
-routine 当前 prompt 的真实版本以 `RemoteTrigger action:get trigger_id:trig_01WqFq2oP9jkSELV75hLiNpu`
-查到的为准，不要看 automation/routine-design.md 的旧草稿（那是排查前的设计，已过时，
-没有回头更新，下次有空再补一份准确版）。
+最早尝试云端 routine + Telegram：云端沙盒出网白名单不含 api.telegram.org（403 CONNECT），
+排除。PushNotification/Remote Control 需要本地活跃会话，云端独立触发推不到手机，排除。
+用 Gmail MCP 发邮件那条路曾经跑通过（routine `trig_01WqFq2oP9jkSELV75hLiNpu`），但
+用户后来又建了 Telegram bot，本地 launchd 直连 Telegram 更直接，成为最终方案。
+
+**遗留：云端 Gmail routine `trig_01WqFq2oP9jkSELV75hLiNpu` 可能仍在启用**，与本地
+Telegram 双通道同时发会重复。若它还在跑，去 https://claude.ai/code/routines 停用。
+
+## 故障复盘（2026-08-21~27 断推一周）
+
+- 现象：Telegram 一周没收到闪卡。launchd 每天正常触发，日志每天打"本周已发完，已通知过，跳过"。
+- 根因：**不是机制坏了，是内容断了**。`flashcards.json` 只有 Week 1 的 10 张卡，8-20 发完后
+  脚本按设计进入"等下周更新"；但 Week 2 的课程和闪卡从来没被写出来，于是静默一周。
+- 教训：这套陪伴学习的内容必须**主动维护**。本期一次性把 Week 2-4 的 tasks + 闪卡（45 张）
+  都补齐了，按工作日 3 次/天算大约 15 张/周，正好匹配。之后每周内容提前批量生成，
+  不要让"下周更新"变成无人兑现的承诺。
 
 ## 仓库
 
-github.com/michaelxu0814-ai/FDE-Manual （**public**，已改公开以绕开云端写权限问题；
-内容本身不敏感，个人学习项目）
+github.com/michaelxu0814-ai/FDE-Manual（**public**，学习项目内容不敏感）。
+git push 用显式 token URL（macOS keychain 的 gh token 是旧的）：
+`https://michaelxu0814-ai:<gh auth token>@github.com/michaelxu0814-ai/FDE-Manual.git`
 
 ## 关键约束（勿忘）
 
 - 技术骨架固定，不随 phase 换：Python + Claude API + SQLite/Pandas + Streamlit + Railway/Vercel + Git + Claude Code
 - 3 段模拟客户与用户现有工作（健身器材公司）完全脱钩，避免混淆
-- 每天 1 小时深度 session 是核心学习场景；闪卡推送只是轻量巩固，前期先跑，量级可调
+- 每天 1 小时深度 session 是核心学习场景；闪卡推送只是轻量巩固，量级可调
+- 闪卡节奏约 15 张/周（3 次/天 × 5 工作日），内容先备足，别让推送断
