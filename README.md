@@ -55,6 +55,7 @@ AI 应用落地方向的 Forward Deployed Engineer —— 技术是手段，解�
 FDE-Manual/
   STATE.md              会话开场先读
   README.md             本文件（学什么）
+  PLAYBOOK.md           **指挥手册：怎么给 Claude 下指令把项目落地** ← 主线，先读这个
   CONVENTIONS.md        工作规约（怎么做才算合规：装包前核查、密钥纪律、执行前解释）
   phase-01/
     week-01-tasks.md     Week 1 每日任务：为什么学、学什么（每天末尾带「延展」）
