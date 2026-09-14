@@ -1,7 +1,7 @@
 {
   "current_week": 2,
-  "last_sent_id": "w4-04",
-  "last_sent_at": "2026-09-11T06:10:25Z",
+  "last_sent_id": "w4-05",
+  "last_sent_at": "2026-09-14T00:03:03Z",
   "sent_ids": [
     "w1-01",
     "w1-02",
@@ -46,7 +46,8 @@
     "w4-01",
     "w4-02",
     "w4-03",
-    "w4-04"
+    "w4-04",
+    "w4-05"
   ],
   "week_complete_notified": false
 }
